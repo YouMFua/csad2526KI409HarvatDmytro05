@@ -16,6 +16,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -23,16 +24,26 @@ jobs:
       - name: Set up CMake
         uses: jwlawson/actions-setup-cmake@v1
 
-      - name: Run build script (Linux/macOS)
-        if: runner.os != 'Windows'
-        run: |
-          chmod +x build.sh
-          ./ci.sh
-
-      - name: Run build script (Windows)
+      - name: Ensure bash available (Windows only)
         if: runner.os == 'Windows'
         run: |
-          .\ci.bat
+          choco install git -y
+          echo "Bash installed for Windows runner"
+
+      - name: Make scripts executable
+        shell: bash
+        run: |
+          chmod +x ci.sh || true
+          chmod +x build.sh || true
+
+      - name: Run CI build
+        shell: bash
+        run: |
+          echo "Running CI script on $RUNNER_OS"
+          ./ci.sh
 
       - name: Deploy
-        run: echo "Deploy step (customize as needed)"
+        if: success()
+        shell: bash
+        run: |
+          echo "Deploy step (customize as needed)"
