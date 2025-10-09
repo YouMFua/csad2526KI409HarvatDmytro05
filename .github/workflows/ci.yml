@@ -28,6 +28,10 @@ jobs:
       - name: Set up Ninja
         uses: seanmiddleditch/gha-setup-ninja@v5
 
+      - name: Set up MSVC compiler
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
       - name: Build and test
         shell: bash
         run: |
