@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
-set -e  # зупинятись при помилках
+set -e  # stop on error
 
-cd /tmp
-cp -r /mnt/c/csad2526KI409HarvatDmytro05 ./project
-cd project
+echo "=== Preparing build environment ==="
+# Always work from a clean temp copy so the build is isolated
+WORKDIR=/tmp/project_build_$$
+mkdir -p "$WORKDIR"
+echo "Copying sources to $WORKDIR ..."
+cp -r . "$WORKDIR"
+cd "$WORKDIR"
 
 echo "=== Cleaning previous build ==="
 rm -rf build
@@ -26,5 +30,4 @@ cmake --build . --config Release
 echo "=== Running tests ==="
 ctest --output-on-failure
 
-cd ..
 echo "=== Build and test complete ==="

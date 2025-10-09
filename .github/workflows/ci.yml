@@ -14,6 +14,7 @@ jobs:
   cross_build:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
@@ -27,8 +28,29 @@ jobs:
       - name: Set up Ninja
         uses: seanmiddleditch/gha-setup-ninja@v5
 
-      - name: Build and test
+      - name: Build and Test (Cross-Platform)
         shell: bash
         run: |
-          chmod +x ci.sh
-          ./ci.sh
+          set -e
+          echo "=== Cleaning previous build ==="
+          rm -rf build
+
+          echo "=== Creating build directory ==="
+          mkdir -p build
+          cd build
+
+          echo "=== Configuring project with CMake + Ninja ==="
+          cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release ..
+
+          echo "=== Building project ==="
+          cmake --build . --config Release
+
+          echo "=== Running tests ==="
+          ctest --output-on-failure
+
+          echo "=== Build and test complete ==="
+
+      - name: Deploy
+        if: success()
+        shell: bash
+        run: echo "Deploy step (customize as needed)"
