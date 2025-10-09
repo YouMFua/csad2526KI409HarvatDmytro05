@@ -28,28 +28,12 @@ jobs:
       - name: Set up Ninja
         uses: seanmiddleditch/gha-setup-ninja@v5
 
-      - name: Build and Test (Cross-Platform)
+      - name: Build and test
         shell: bash
         run: |
-          set -e
-          echo "=== Cleaning previous build ==="
-          rm -rf build
-
-          echo "=== Creating build directory ==="
-          mkdir -p build
-          cd build
-
-          echo "=== Configuring project with CMake + Ninja ==="
-          cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release ..
-
-          echo "=== Building project ==="
-          cmake --build . --config Release
-
-          echo "=== Running tests ==="
-          ctest --output-on-failure
-
-          echo "=== Build and test complete ==="
-
+          chmod +x ci.sh
+          ./ci.sh
+        
       - name: Deploy
         if: success()
         shell: bash
