@@ -24,26 +24,11 @@ jobs:
       - name: Set up CMake
         uses: jwlawson/actions-setup-cmake@v1
 
-      - name: Ensure bash available (Windows only)
-        if: runner.os == 'Windows'
-        run: |
-          choco install git -y
-          echo "Bash installed for Windows runner"
+      - name: Set up Ninja
+        uses: seanmiddleditch/gha-setup-ninja@v5
 
-      - name: Make scripts executable
+      - name: Build and test
         shell: bash
         run: |
-          chmod +x ci.sh || true
-          chmod +x build.sh || true
-
-      - name: Run CI build
-        shell: bash
-        run: |
-          echo "Running CI script on $RUNNER_OS"
+          chmod +x ci.sh
           ./ci.sh
-
-      - name: Deploy
-        if: success()
-        shell: bash
-        run: |
-          echo "Deploy step (customize as needed)"
