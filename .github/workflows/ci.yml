@@ -1,0 +1,38 @@
+name: Cross-platform Build and Test
+
+on:
+  push:
+    branches:
+      - '**develop**'
+      - '**master**'
+  pull_request:
+    branches:
+      - '**develop**'
+      - '**master**'
+
+jobs:
+  cross_build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@v1
+
+      - name: Run build script (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          chmod +x build.sh
+          ./ci.sh
+
+      - name: Run build script (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          .\ci.bat
+
+      - name: Deploy
+        run: echo "Deploy step (customize as needed)"
