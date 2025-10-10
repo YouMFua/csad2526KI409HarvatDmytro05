@@ -1,0 +1,44 @@
+name: Cross-platform Build and Test
+
+on:
+  push:
+    branches:
+      - '**develop**'
+      - '**master**'
+  pull_request:
+    branches:
+      - '**develop**'
+      - '**master**'
+
+jobs:
+  cross_build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@v1
+
+      - name: Set up Ninja
+        uses: seanmiddleditch/gha-setup-ninja@v5
+
+      - name: Set up MSVC compiler
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Build and test
+        shell: bash
+        run: |
+          chmod +x ci.sh
+          ./ci.sh
+        
+      - name: Deploy
+        if: success()
+        shell: bash
+        run: echo "Deploy step (customize as needed)"

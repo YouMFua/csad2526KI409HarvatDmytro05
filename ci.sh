@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
-set -e  # зупинятись при помилках
+set -e
+
+echo "=== Preparing build environment ==="
+WORKDIR=/tmp/project_build_$$
+mkdir -p "$WORKDIR"
+echo "Copying sources to $WORKDIR ..."
+cp -r . "$WORKDIR"
+cd "$WORKDIR"
 
 echo "=== Cleaning previous build ==="
 rm -rf build
@@ -8,14 +15,21 @@ echo "=== Creating build directory ==="
 mkdir -p build
 cd build
 
-echo "=== Configuring project with MinGW / GCC ==="
-cmake -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ ..
+echo "=== Detecting platform and configuring ==="
+case "$(uname -s)" in
+  Linux*)   cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release .. ;;
+  Darwin*)  cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release .. ;;
+  MINGW*|MSYS*|CYGWIN*) 
+    echo "Windows environment detected"
+    cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release .. 
+    ;;
+  *) echo "Unknown OS"; exit 1 ;;
+esac
 
 echo "=== Building project ==="
-mingw32-make
+cmake --build . --config Release
 
 echo "=== Running tests ==="
 ctest --output-on-failure
 
-cd ..
 echo "=== Build and test complete ==="
