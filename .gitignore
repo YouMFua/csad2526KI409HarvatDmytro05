@@ -6,6 +6,7 @@
 /*.sln
 /*.vcxproj*
 /cmake_install.cmake
+/Lab2/build
 
 # Compiled binaries
 *.exe
